@@ -18,7 +18,7 @@
 
 		<div class="left-nav">
 			<ul class="nav nav-pills nav-stacked">
-				<li class="active"><a href="#home" data-toggle="pill">Home</a></li>
+				<li class="active"><a href="#home" data-toggle="pill">About Me</a></li>
 				<li><a href="#pro-work" data-toggle="pill">Professional Work</a></li>
 				<li><a href="#grad-work" data-toggle="pill">Graduate Work</a></li>
 				<li><a href="#personal" data-toggle="pill">Personal Projects</a></li>
@@ -34,11 +34,72 @@
 				</div>
 				<div class="tab-pane" id="pro-work">
 					<div class="tab-header">Professional Work</div>
-					<div class="tab-text">Talk about pro work</div>
+					<div class="tab-text">
+						<div class="project-section">
+							<div class="project-section-title">
+								Making History: The Great War
+							</div>
+							<img src="media/mhtgw.jpg" class="mhtgw-img"/>
+							<div class="project-section-text">
+								<p>
+									<a href="http://store.steampowered.com/app/279140/" target="_blank">Making History: The Great War</a> (TGW) is
+									a turn based grand strategy game set during the events of World War I. The game features different scenarios that start at
+									different dates around the beginning and (with a recently released DLC) end of the war. Any nation in the game is playable and
+									the game features full multiplayer and mod support.
+								</p>
+								<p>
+									I joined Muzzy Lane after work on TGW had already begun and after the game's initial early access release on steam. My role
+									was to finish feature/system implementation and to improve and expand upon both the economic and military AI. Soon after joining,
+									I effectively took ownership of these systems and pushed for a feature complete release in January 2015. For my work, I was credited 
+									as lead engineer. Developmental work on TGW continued until mid-summer 2015, where I focused primarily on new features for the recently
+									released DLC <a href="http://store.steampowered.com/app/402660/" target="_blank">The Red Army</a>. 
+								</p>
+							</div>
+						</div>
+						<div class="project-section">
+							<div class="project-section-title">
+								Smart Sim
+							</div>
+							<img src="media/simgen.png" class="simgen-img"/>
+							<div class="project-section-text">
+								Smart Sim is my most recent project with Muzzy Lane.
+							</div>
+						</div>
+					</div>
 				</div>
 				<div class="tab-pane" id="grad-work">
 					<div class="tab-header">Graduate Work</div>
-					<div class="tab-text">Talk about Zeus-MP</div>
+					<div class="tab-text">							
+						<p>
+							As a graduate student at the University of Arizona, I used Zeus-MP to simulate accretion disks around
+							black holes. Zeus-MP is a popular 3D massively parallel radiation magneto-hydrodynamics code. 
+							It was originally developed by <a href="http://adsabs.harvard.edu/abs/1992ApJS...80..753S" target=_blank>Stone and Norman</a>
+							and later modified by <a href="http://adsabs.harvard.edu/abs/2006ApJS..165..188H" target=_blank>Hayes et. al</a> 
+							to utilize MPI for parallel computing. 
+							By using generic metrics, the equations solved therein are independent of any specific 
+							geometry, making the code versatile enough to easily handle different geometries. Additionally, Zeus-MP's
+							inclusion of both magnetic fields and radiation makes the code versatile enough to handle many different
+							Astrophysical fluids problems. 
+						</p> 
+						<p>
+							Using the hydro and radiation modules of Zeus-MP, we set out to determine what effects
+							radiation pressure have on the rates at which black holes devour gas and grow. This project involved an 
+							enormous amount of effort to develop a self-consistent model with which to feed gas into the system
+							as well as an appropriate way to build the accretion disk while maintaining stability within the code.
+						</p>
+						<p>
+							Using the Steele cluster at Purdue university, I ran several different simulations with varying gas inflow rates
+							and free-free emission strengths. The results of one such run are stored 
+							<a href="http://www.physics.arizona.edu/~pjenks/fstart/noVisc/f100/k1/" target=_blank>here</a>. The following figure
+							and video show the gas inflow rate at ~40 blackhole radii normalized by a theoretical maximum and a log-density plot 
+							(with velocity arrow overlays) of the simulation respectively. The original .mpg version of the video is available
+							<a href="media/vel.mpg" target="_blank">here</a>.
+						</p>
+						<p class="align-center">
+							<img src="media/mdot.jpg" class="zeus-img"/>
+							<video autoplay controls width="450px" height="450px" src="media/vel.mp4"/>
+						</p>
+					</div>
 				</div>
 				<div class="tab-pane" id="personal">
 					<div class="tab-header">Personal Projects</div>
