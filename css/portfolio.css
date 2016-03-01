@@ -60,6 +60,7 @@ body {
 	vertical-align: top;
 	margin-top: 5px;
 	background-color: white;
+	overflow-y: auto;
 }
 
 .tab-content {
@@ -86,6 +87,9 @@ body {
 	font-weight: bold;
 	font-style: italic;
 }
+li > .project-title {
+	font-style: italic;
+}
 
 .zeus-img {
 	width: 350px;
@@ -100,10 +104,24 @@ body {
 	margin-right: 20px;
 }
 .simgen-img {
-	width: 700px;
-	height: auto;
+	width: auto;
+	height: 340px;
 	float: right;
 	margin-left: 20px;
+	position: relative;
+	top: -40px;
+}
+.simgen-text {
+	min-height: 340px;
+}
+.pandemic-img {
+	height: 300px;
+	width: auto;
+	float: left;
+	margin-right: 20px;
+}
+.pandemic-text {
+	min-height: 300px;
 }
 
 .align-center {
