@@ -17,6 +17,12 @@ body {
 	width: 100%;
 	height: 50px;
 	background-color: #515151;
+
+	color: white;
+	font-weight: bold;
+	font-size: 33px;
+	padding-left: 20px;
+	font-style: italic;
 }
 
 .left-nav {
@@ -87,6 +93,10 @@ body {
 	font-weight: bold;
 	font-style: italic;
 }
+.project-section-title.right {
+	text-align: right;
+}
+
 li > .project-title {
 	font-style: italic;
 }
@@ -108,8 +118,6 @@ li > .project-title {
 	height: 340px;
 	float: right;
 	margin-left: 20px;
-	position: relative;
-	top: -40px;
 }
 .simgen-text {
 	min-height: 340px;
@@ -122,6 +130,23 @@ li > .project-title {
 }
 .pandemic-text {
 	min-height: 300px;
+}
+
+.coll-text {
+	margin-top: 40px;
+}
+.plane-video, .coll-video {
+	float: left;
+	margin-right: 20px;
+}
+.reaver-video {
+	float: right;
+	margin-left: 20px;
+}
+
+.sim-video {
+	margin-left: 50px;
+	margin-right: 50px;
 }
 
 .align-center {

@@ -14,7 +14,7 @@
 	</head>
 	<body>
 		
-		<div class="top-bar"></div>
+		<div class="top-bar">Phillip Jenks - Portfolio</div>
 
 		<div class="left-nav">
 			<ul class="nav nav-pills nav-stacked">
@@ -57,7 +57,7 @@
 							</div>
 						</div>
 						<div class="project-section">
-							<div class="project-section-title">
+							<div class="project-section-title right">
 								Smart Sim
 							</div>
 							<div class="project-section-text">
@@ -162,17 +162,85 @@
 						</p>
 						<p class="align-center">
 							<img src="media/mdot.jpg" class="zeus-img"/>
-							<video autoplay controls width="450px" height="450px" src="media/vel.mp4"/>
+							<iframe width="450" height="340" src="https://www.youtube.com/embed/zScX39KaEo8" frameborder="0" allowfullscreen></iframe>
 						</p>
 					</div>
 				</div>
 				<div class="tab-pane" id="personal">
 					<div class="tab-header">Personal Projects</div>
-					<div class="tab-text">Talk about personal projects</div>
+					<div class="tab-text">
+						<div class="project-section">
+							<div class="project-section-title">
+								Games
+							</div>
+							<div class="project-section-text">
+								<p>
+									<iframe class="plane-video" width="400" height="300" src="https://www.youtube.com/embed/XfYLkURLvPo" frameborder="0" allowfullscreen></iframe>
+									All of my personal game projects center around my SDL/OpenGL rendering engine I call Oracle. Oracle is a scene
+									based engine written in C++ that uses SDL and OpenGL for both 3D and 2D rendering. It includes utilities for custom
+									shaders, texture and model transformations, basic collisions, particles, and a simple UI system consisting of panels, buttons, and
+									text entry fields. My biggest project to date using Oracle is a space based strategy game called Reaver. Reaver consists
+									of two main scenes. The first is a top level strategy layer consisting of a graph of connected planets where the player can
+									purchase ships, travel to different planets, and attack enemy planets. The second is a turn based tactical layer where the
+									battles for planets occurs. Turns are taken per ship instead of per player where the order is determined by ship initiative.
+									Each ship has two modes of firing and a set speed that determines how far they can move in a turn.
+								</p>
+								<p>
+									<iframe class="reaver-video" width="400" height="300" src="https://www.youtube.com/embed/gyPnYCM822s" frameborder="0" allowfullscreen></iframe>
+									The videos featured in this section include a 3D tech test of a plane flying around a 3D environment, a gameplay demo of Reaver,
+									and a gameplay demo of a pseudo-shmup style game. In the shmup demo, the player has several weapon types including a standard projectile,
+									triple fire projectile, homing missiles, and a flak launcher. In order to handle collision detection for this game while maintaining
+									a roughly 60 fps frame-rate, I built a generic 2D search tree based off of axis aligned bounding boxes. The tree itself is rebalanced
+									in a separate thread from the game's main loop while Oracle renders the scene. This search tree is featured in the 'Code Sample' section 
+									of this portfolio.
+								</p>
+								<div class="align-center">
+									<iframe width="400" height="300" src="https://www.youtube.com/embed/8D_80pD5QxI" frameborder="0" allowfullscreen></iframe>
+								</div>
+							</div>
+						</div>
+						<div class="project-section">
+							<div class="project-section-title right">
+								Simulation
+							</div>
+							<div class="project-section-text">
+								<p>
+									In addition to my interest in gaming, I also have an interest in simulation. The videos shown here show two different simulations
+									using an N-Particle simulator that I wrote. The first is a simulation of two colliding galaxies. This simulation shows some nice features
+									of a close-by collision including tidal tails. The stars shooting rapidly from the galaxy centers is a the result of a numerical effect.
+									This is solved using a softening parameter in the gravitational force calculation, which has been intentionally left out here. The second
+									video shows a common Astrophysical problem known as the three-body problem. This simulation illustrates the potentially chaotic behavior
+									of three interacting stars.
+								</p>
+								<div class="align-center">
+									<iframe class="sim-video" width="400" height="300" src="https://www.youtube.com/embed/VI4cCQsZ4ds" frameborder="0" allowfullscreen></iframe>
+									<iframe class="sim-video" width="400" height="300" src="https://www.youtube.com/embed/649cwr_qaUA" frameborder="0" allowfullscreen></iframe>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 				<div class="tab-pane" id="code-sample">
 					<div class="tab-header">Code Sample</div>
-					<div class="tab-text">Talk about search tree</div>
+					<div class="tab-text">
+						<ul>
+							<li><span class="project-title">2D Search Tree Template</span>: TODO: LINK TREE HERE</li>
+							<li><span class="project-title">Specialization of Search Tree For Bounding Box Colliders</span>: TODO: LINK PREDICATE HERE</li>
+							<li><span class="project-title">Implementation Example</span>: TODO: LINK SEARCH TEST SCENE HERE</li>
+						</ul>
+						<p class="coll-text">
+							<iframe class="coll-video" width="420" height="315" src="https://www.youtube.com/embed/62l-GwzC8qk" frameborder="0" allowfullscreen></iframe>
+							The base search tree is designed to handle any 2D search where the search space for a node is defined by four quadrants and can be represented
+							by the same type as a test element. A test element can belong to any number of node quadrants.
+							Implementation for a specific type is accomplished by overriding a set of pure virtual functions that define
+							the behavior of the tree. The specific implementation of the tree using 2D axis aligned bounding boxes is provided above. In this case, each node
+							is represented by a bounding box. When elements are pushed into the tree, all nodes that "contain" that element will either directly hold onto 
+							that element or subdivide its space into quadrants, creating four new leafs to hold onto its elements. A specific use of this tree is illustrated
+							in the video shown. In this case, all arrows are entered into the search tree. The green arrow is controlled by the player's mouse and red 
+							arrows are the elements returned by the search tree using the mouse arrow as a test element. These red elements can then be tested for
+							a potentially more expensive collision calculation. The implementation of this scene is also provided.
+						</p>
+					</div>
 				</div>
 			</div>
 		</div>
