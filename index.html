@@ -272,8 +272,8 @@
 							Implementation for specific search and value types is accomplished by overriding a set of pure virtual functions that define
 							the behavior of the tree. The specific implementation of the tree using 2D axis aligned bounding boxes and 2D sprites is provided above. 
 							In this case, each node
-							is represented by a bounding box. When values are pushed into the tree, all nodes that "contain" that value will either directly hold onto 
-							that value or subdivide its space into quadrants, creating four new leafs to hold onto its values. A specific use of this tree is illustrated
+							is represented by a bounding box. When sprites are pushed into the tree, all nodes that overlap with that sprite will either directly hold onto 
+							that sprite or subdivide its space into quadrants, creating four new leafs to hold onto its sprites. A specific use of this tree is illustrated
 							in the video shown. In this case, all arrows are entered into the search tree. The green arrow is controlled by the player's mouse and the red 
 							arrows are the sprites returned by the search tree using the mouse arrow as a test value. These red sprites can then be tested for
 							a potentially more expensive collision calculation. The implementation of this scene is also provided.
