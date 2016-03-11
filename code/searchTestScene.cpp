@@ -16,6 +16,7 @@
 #include "searchTestPredicate.h"
 
 // Utility function used for rebalancing the search tree
+// in a separate thread
 namespace test {
 	int rebalanceTree(void* tr) {
 		TestTree* tree = (TestTree*) tr;
@@ -63,7 +64,7 @@ void SearchTestScene::load() {
 		spr->setVel((GLfloat)vx, (GLfloat)vy, 0.0f);
 		spr->setTexture("data/misc/mouse.png");
 
-		// gameObjs will manage memory for us, clearing the sprites on unload
+		// gameObjs will manage memory for us, deleting the sprites on a scene change or quit
 		gameObjs.push_back(spr);
 
 		// hold our own copy of the sprite
@@ -94,7 +95,11 @@ void SearchTestScene::unload() {
 	// Wait for any rebalancing to finish
 	m_treeThread.wait();
 
-	// clear our predicate
+	// Clean up our thread
+	m_treeThread.setFunc(nullptr);
+	m_treeThread.setInput(nullptr);
+
+	// Clear our predicate
 	if (m_testPredicate) {
 		delete m_testPredicate;
 		m_testPredicate = nullptr;
@@ -103,6 +108,9 @@ void SearchTestScene::unload() {
 	// Clear out our tree
 	m_tree.clear();
 	m_tree.setPredicate(nullptr);
+
+	// Remove now invalid sprite pointers
+	m_sprites.clear();
 }
 
 void SearchTestScene::update() {
@@ -125,7 +133,7 @@ void SearchTestScene::update() {
 	// Build a test collider based on our mouse
 	Collider coll = TestPredicate().nilCompare();
 	coll.moveTo((GLfloat)(Oracle().getMouse().x() - 20), (GLfloat)(Oracle().getMouse().y() - 20), 0.0f);
-	coll.setScale(40, 40, 1);
+	coll.setScale(40.0f, 40.0f, 1.0f);
 	
 	// Grab all sprites near the mouse based on a search in the tree
 	std::set<SearchTestSprite*> setnear = m_tree.getNearbyValues(coll);

@@ -100,6 +100,7 @@ public:
 	void setPredicate(Predicate*);
 
 	// Inserts a value into the tree
+	// This may leave the tree unbalanced
 	void add(const Value& val);
 
 	// Removes a value from the tree
@@ -367,10 +368,10 @@ void SearchTree2D<Value, NodeCompare>::Node::clear() {
 template<class Value, class NodeCompare>
 auto SearchTree2D<Value, NodeCompare>::Node::getNearbyValues(const NodeCompare& compare) const -> SetValue {
 
-	// our return set
+	// Our return set
 	SetValue nearbyVals;
 	if (hasChildren()) {
-		// chech children and get their values if compare overlaps with their search space
+		// Check children and get their values if compare overlaps with the childs's search space
 		for (auto region : m_mapRegions) {
 			if (region.second) {
 				SetValue childVals = region.second->getNearbyValues(compare);
@@ -382,7 +383,7 @@ auto SearchTree2D<Value, NodeCompare>::Node::getNearbyValues(const NodeCompare& 
 		// return our values if compare overlaps with our search space
 		if (m_predicate && m_predicate->overlaps(m_compare, compare)) {
 
-			// std::set guarantees uniqueness
+			// std::set guarantees uniqueness (values may belong to more than one node)
 			nearbyVals.insert(m_data.begin(), m_data.end());
 		}
 	}
@@ -410,7 +411,7 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 
 	SetValue setAllData = getAllChildValues();
 
-	// remove data that no longer satisfies this node's compare
+	// Remove data that no longer satisfies this node's compare
 	for (SetValue::iterator itSet = setAllData.begin(); itSet != setAllData.end(); ) {
 		if (!m_predicate->satisfies(m_compare, *itSet)) {
 			setAllData.erase(itSet++);
@@ -421,7 +422,7 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 	}
 
 	if (hasChildren()) {
-		// should we keep the children?
+		// Should we keep the children?
 		// first just check raw data size
 
 		if (setAllData.size() <= g_minDataSize) {
@@ -431,16 +432,16 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 		}
 		else {
 
-			// now check if subdividing will do anything
+			// Now check if subdividing will do anything
 
-			// let's update our child quadrants
-			// grab references to our children's search spaces
+			// Let's update our child quadrants
+			// First grab references to our children's search spaces
 			QuadMap mapQuads;
 			for (auto region : m_mapRegions) {
 				mapQuads.insert(QuadPair(region.first, region.second->m_compare));
 			}
 
-			// User our predicate to rebuild our quadrant search spaces
+			// Use our predicate to rebuild our quadrant search spaces
 			m_predicate->buildQuadrantsFromData(m_compare, setAllData, mapQuads);
 
 			// Do we still need children?
@@ -468,7 +469,7 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 			}
 		}
 	} 
-	// should we subdivide and create children?
+	// Should we subdivide and create children?
 	else {
 		// check raw data size
 		if (setAllData.size() <= g_minDataSize) {
@@ -477,7 +478,7 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 		}
 		else {
 			
-			// let's build some test quads and see if they will subdivide
+			// Let's build some test quads and see if they will subdivide
 
 			NodeCompare ulComp = m_predicate->nilCompare();
 			NodeCompare urComp = m_predicate->nilCompare();
@@ -578,7 +579,7 @@ bool SearchTree2D<Value, NodeCompare>::Node::shouldSubdivide(const std::set<Valu
 {
 	// Is there a value that doesn't satisfy all regions?
 	// If not, then all children will have the same values, so there is no need to subdivide
-	// This is an admittedly simple test, but works for testing
+	// This is an admittedly simple test, but it works for an initial implementation
 	// We could instead test if the tree would be well-balanced or we could 
 	// limit by the number of operations
 	bool inAllRegions = true;

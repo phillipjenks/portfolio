@@ -4,7 +4,7 @@
 	Written by: Phillip Jenks
 
 	A scene populated by several sprites confined to the screen space with random
-	positions and random velocities. We'll test our search tree vs our mouse
+	positions and random velocities. We'll test our search tree with our mouse
 */
 
 #ifndef __SEARCH_TEST_SCENE_H_
@@ -37,7 +37,7 @@ class SearchTestScene : public orc::Scene {
 	// Unload scene assets
 	virtual void unload();
 
-	// update game objects in the scene
+	// Update game objects in the scene using our search tree
 	virtual void update();
 
 	// Handle any post update operations
