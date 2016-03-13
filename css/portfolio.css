@@ -132,6 +132,10 @@ li > .project-title {
 	min-height: 300px;
 }
 
+.oracle-text {
+	min-height: 300px;
+}
+
 .coll-text {
 	margin-top: 40px;
 }
@@ -140,8 +144,15 @@ li > .project-title {
 	margin-right: 20px;
 }
 .reaver-video {
+	float: left;
+	margin-right: 20px;
+}
+.shmup-video {
 	float: right;
 	margin-left: 20px;
+}
+.games-text {
+	min-height: 300px;
 }
 
 .sim-video {
