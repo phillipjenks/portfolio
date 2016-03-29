@@ -95,6 +95,14 @@ public:
 	SearchTree2D(Predicate*);
 	~SearchTree2D();
 
+	// Disallow copying
+	SearchTree2D(const SearchTree2D&) = delete;
+	SearchTree2D& operator=(const SearchTree2D&) = delete;
+
+	// Move Operations
+	SearchTree2D(SearchTree2D&&);
+	SearchTree2D& operator=(SearchTree2D&&);
+
 	// Sets the predicate for the tree
 	// Memory management for the predicate is assumed to be handled by the caller
 	void setPredicate(Predicate*);
@@ -216,6 +224,26 @@ SearchTree2D<Value, NodeCompare>::~SearchTree2D() {
 }
 
 template<class Value, class NodeCompare>
+SearchTree2D<Value, NodeCompare>::SearchTree2D(SearchTree2D&& otherTree)
+	: m_predicate(otherTree.m_predicate)
+	, m_tree(otherTree.m_tree)
+{
+	otherTree.m_predicate = nullptr;
+	otherTree.m_tree = nullptr;
+}
+
+template<class Value, class NodeCompare>
+SearchTree2D<Value, NodeCompare>& SearchTree2D<Value, NodeCompare>::operator=(SearchTree2D&& otherTree) {
+	m_predicate = otherTree.m_predicate;
+	m_tree = otherTree.m_tree;
+
+	otherTree.m_predicate = nullptr;
+	otherTree.m_tree = nullptr;
+
+	return *this;
+}
+
+template<class Value, class NodeCompare>
 void SearchTree2D<Value, NodeCompare>::setPredicate(Predicate* pred) {
 	m_predicate = pred;
 	if (m_tree) {
@@ -298,7 +326,6 @@ template<class Value, class NodeCompare>
 SearchTree2D<Value, NodeCompare>::Node::~Node() {
 	
 	clear();
-	deleteChildren();
 }
 
 template<class Value, class NodeCompare>
@@ -323,11 +350,22 @@ void SearchTree2D<Value, NodeCompare>::Node::add(const Value& val) {
 	}
 
 	if (hasChildren()) {
+		bool wasAdded = false;
 		for (auto region : m_mapRegions) {
 			// Check children of they should hold the value
 			if (region.second && m_predicate->satisfies(region.second->m_compare, val)) {
 				region.second->add(val);
+				wasAdded = true;
 			}
+		}
+
+		if (!wasAdded) {
+			// The new value wasn't added to any children. This means that there is
+			// either a bug in predicate implementation or this is the root node
+			// and the new value belongs outside of the root search space.
+			// Either way, let's hold onto this value as part of this node and let a future
+			// rebalance ensure the child search spaces satisfy this value
+			m_data.insert(val);
 		}
 	}
 	else {
@@ -345,9 +383,8 @@ void SearchTree2D<Value, NodeCompare>::Node::remove(const Value& val) {
 			}
 		}
 	}
-	else {
-		m_data.erase(val);
-	}
+
+	m_data.erase(val);
 }
 
 template<class Value, class NodeCompare>
@@ -360,9 +397,8 @@ void SearchTree2D<Value, NodeCompare>::Node::clear() {
 		}
 		deleteChildren();
 	}
-	else {
-		m_data.clear();
-	}
+
+	m_data.clear();
 }
 
 template<class Value, class NodeCompare>
@@ -379,13 +415,13 @@ auto SearchTree2D<Value, NodeCompare>::Node::getNearbyValues(const NodeCompare& 
 			}
 		}
 	}
-	else {
-		// return our values if compare overlaps with our search space
-		if (m_predicate && m_predicate->overlaps(m_compare, compare)) {
 
-			// std::set guarantees uniqueness (values may belong to more than one node)
-			nearbyVals.insert(m_data.begin(), m_data.end());
-		}
+	// Return our values if compare overlaps with our search space
+	// This will also return orphaned values that belong to this node but not its children
+	if (m_predicate && m_predicate->overlaps(m_compare, compare)) {
+
+		// std::set guarantees uniqueness (values may belong to more than one node)
+		nearbyVals.insert(m_data.begin(), m_data.end());
 	}
 
 	return nearbyVals;
@@ -421,6 +457,10 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 		}
 	}
 
+	// Clear our local set. This set will be reset if necessary and will also
+	// hold onto orphaned values if necessary
+	m_data.clear();
+
 	if (hasChildren()) {
 		// Should we keep the children?
 		// first just check raw data size
@@ -449,6 +489,7 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 
 				// Re-add our data to our children
 				for (auto thisVal : setAllData) {
+					// This may modify m_data of the value is orphaned
 					add(thisVal);
 				}
 
@@ -458,9 +499,6 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 						region.second->rebalance();
 					}
 				}
-
-				// ensure we're not holding onto duplicate data. The child nodes hold all children
-				m_data.clear();
 			}
 			else {
 				// We no longer need children. Just hold onto the data ourselves
@@ -507,6 +545,7 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 
 				// Add the values to our children
 				for (auto thisVal : setAllData) {
+					// This may modify m_data of the value is orphaned
 					add(thisVal);
 				}
 
@@ -517,9 +556,6 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 						region.second->rebalance();
 					}
 				}
-
-				// We no longer need to hold onto this data
-				m_data.clear();
 			}
 			else {
 
@@ -557,9 +593,9 @@ auto SearchTree2D<Value, NodeCompare>::Node::getAllChildValues() const -> SetVal
 			}
 		}
 	}
-	else {
-		setData.insert(m_data.begin(), m_data.end());
-	}
+
+	// This will include orphaned values if we have them
+	setData.insert(m_data.begin(), m_data.end());
 
 	return setData;
 }
