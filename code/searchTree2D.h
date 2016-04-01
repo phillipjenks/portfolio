@@ -19,6 +19,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <utility>
 
 // Utility enum to mark each search quadrant
 // The values are chosen to allow bitwise operations
@@ -76,7 +77,6 @@ public:
 	virtual bool overlaps(const NodeCompare& compareLeft, const NodeCompare& compareRight) = 0;
 };
 
-
 //=======================================
 // Main Tree Interface
 //=======================================
@@ -95,13 +95,21 @@ public:
 	SearchTree2D(Predicate*);
 	~SearchTree2D();
 
-	// Disallow copying
-	SearchTree2D(const SearchTree2D&) = delete;
-	SearchTree2D& operator=(const SearchTree2D&) = delete;
+	// Copy constructor and assignment
+	SearchTree2D(const SearchTree2D&);
+	SearchTree2D& operator=(SearchTree2D);
 
 	// Move Operations
 	SearchTree2D(SearchTree2D&&);
 	SearchTree2D& operator=(SearchTree2D&&);
+
+	// swap operation
+	friend void swap(SearchTree2D& left, SearchTree2D& right) {
+		using std::swap;
+
+		swap(left.m_predicate, right.m_predicate);
+		swap(left.m_tree, right.m_tree);
+	}
 
 	// Sets the predicate for the tree
 	// Memory management for the predicate is assumed to be handled by the caller
@@ -113,7 +121,6 @@ public:
 
 	// Removes a value from the tree
 	void remove(const Value& val);
-
 
 	// Empties the tree
 	void clear();
@@ -136,6 +143,17 @@ private:
 		// Constructor. Uses the parent's predicate
 		Node(Predicate* pred);
 		~Node();
+
+		// Copy constructor
+		Node(const Node&);
+
+		// Assignments and Move constructor
+		// Node is an internal class so we don't expect the client to need
+		// these functions. Internally, we only use the copy constructor when
+		// copying trees.
+		Node(Node&&) = delete;
+		Node& operator=(Node) = delete;
+		Node& operator=(Node&&) = delete;
 
 		// Sets the search predicate for this node and all child nodes
 		void setPredicate(Predicate* pred);
@@ -198,7 +216,6 @@ private:
 	Node* m_tree;
 };
 
-
 // =========================================================
 // Main Tree Implementation
 // =========================================================
@@ -221,6 +238,22 @@ SearchTree2D<Value, NodeCompare>::~SearchTree2D() {
 	if (m_tree) {
 		delete m_tree;
 	}
+}
+
+template<class Value, class NodeCompare>
+SearchTree2D<Value, NodeCompare>::SearchTree2D(const SearchTree2D& otherTree) 
+	: m_predicate(otherTree.m_predicate)
+	, m_tree(nullptr)
+{
+	if (otherTree.m_tree) {
+		m_tree = new Node(*(otherTree.m_tree));
+	}
+}
+
+template<class Value, class NodeCompare>
+SearchTree2D<Value, NodeCompare>& SearchTree2D<Value, NodeCompare>::operator=(SearchTree2D<Value, NodeCompare> other) {
+	swap(*this, other);
+	return *this;
 }
 
 template<class Value, class NodeCompare>
@@ -329,12 +362,32 @@ SearchTree2D<Value, NodeCompare>::Node::~Node() {
 }
 
 template<class Value, class NodeCompare>
+SearchTree2D<Value, NodeCompare>::Node::Node(const Node& other) 
+	: m_predicate(other.m_predicate)
+	, m_compare(other.m_compare)
+	, m_mapRegions()
+	, m_data(other.m_data)
+{
+	// build our child node mapping
+	m_mapRegions[RegionCode::UPPER_LEFT] = nullptr;
+	m_mapRegions[RegionCode::UPPER_RIGHT] = nullptr;
+	m_mapRegions[RegionCode::LOWER_LEFT] = nullptr;
+	m_mapRegions[RegionCode::LOWER_RIGHT] = nullptr;
+
+	for (auto&& region : other.m_mapRegions) {
+		if (region.second) {
+			m_mapRegions[region.first] = new Node(*(region.second));
+		}
+	}
+}
+
+template<class Value, class NodeCompare>
 void SearchTree2D<Value, NodeCompare>::Node::setPredicate(SearchPredicate<Value, NodeCompare>* predicate) {
 	// set our predicate
 	m_predicate = predicate;
 
 	// set child predicates
-	for (auto region : m_mapRegions) {
+	for (auto&& region : m_mapRegions) {
 		if (region.second) {
 			region.second->setPredicate(predicate);
 		}
@@ -351,7 +404,7 @@ void SearchTree2D<Value, NodeCompare>::Node::add(const Value& val) {
 
 	if (hasChildren()) {
 		bool wasAdded = false;
-		for (auto region : m_mapRegions) {
+		for (auto&& region : m_mapRegions) {
 			// Check children of they should hold the value
 			if (region.second && m_predicate->satisfies(region.second->m_compare, val)) {
 				region.second->add(val);
@@ -377,7 +430,7 @@ template<class Value, class NodeCompare>
 void SearchTree2D<Value, NodeCompare>::Node::remove(const Value& val) {
 
 	if (hasChildren()) {
-		for (auto region : m_mapRegions) {
+		for (auto&& region : m_mapRegions) {
 			if (region.second) {
 				region.second->remove(val);
 			}
@@ -390,7 +443,7 @@ void SearchTree2D<Value, NodeCompare>::Node::remove(const Value& val) {
 template<class Value, class NodeCompare>
 void SearchTree2D<Value, NodeCompare>::Node::clear() {
 	if (hasChildren()) {
-		for (auto region : m_mapRegions) {
+		for (auto&& region : m_mapRegions) {
 			if (region.second) {
 				region.second->clear();
 			}
@@ -408,7 +461,7 @@ auto SearchTree2D<Value, NodeCompare>::Node::getNearbyValues(const NodeCompare& 
 	SetValue nearbyVals;
 	if (hasChildren()) {
 		// Check children and get their values if compare overlaps with the childs's search space
-		for (auto region : m_mapRegions) {
+		for (auto&& region : m_mapRegions) {
 			if (region.second) {
 				SetValue childVals = region.second->getNearbyValues(compare);
 				nearbyVals.insert(childVals.begin(), childVals.end());
@@ -477,7 +530,7 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 			// Let's update our child quadrants
 			// First grab references to our children's search spaces
 			QuadMap mapQuads;
-			for (auto region : m_mapRegions) {
+			for (auto&& region : m_mapRegions) {
 				mapQuads.insert(QuadPair(region.first, region.second->m_compare));
 			}
 
@@ -494,7 +547,7 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 				}
 
 				// rebalance our child nodes
-				for (auto region : m_mapRegions) {
+				for (auto&& region : m_mapRegions) {
 					if (region.second) {
 						region.second->rebalance();
 					}
@@ -544,14 +597,14 @@ void SearchTree2D<Value, NodeCompare>::Node::rebalance() {
 				}
 
 				// Add the values to our children
-				for (auto thisVal : setAllData) {
+				for (auto&& thisVal : setAllData) {
 					// This may modify m_data of the value is orphaned
 					add(thisVal);
 				}
 
 				// Rebalance our newly created children so they may create
 				// children of their own
-				for (auto region : m_mapRegions) {
+				for (auto&& region : m_mapRegions) {
 					if (region.second) {
 						region.second->rebalance();
 					}
@@ -571,7 +624,7 @@ bool SearchTree2D<Value, NodeCompare>::Node::hasChildren() const {
 
 	// Check if we have at least one child
 	bool hasChild = false;
-	for (auto region : m_mapRegions) {
+	for (auto&& region : m_mapRegions) {
 		if (region.second) {
 			hasChild = true;
 			break;
@@ -586,7 +639,7 @@ auto SearchTree2D<Value, NodeCompare>::Node::getAllChildValues() const -> SetVal
 	// Gather all data belonging to this search space
 	SetValue setData;
 	if (hasChildren()) {
-		for (auto region : m_mapRegions) {
+		for (auto&& region : m_mapRegions) {
 			if (region.second) {
 				SetValue childNodes = region.second->getAllChildValues();
 				setData.insert(childNodes.begin(), childNodes.end());
@@ -619,8 +672,8 @@ bool SearchTree2D<Value, NodeCompare>::Node::shouldSubdivide(const std::set<Valu
 	// We could instead test if the tree would be well-balanced or we could 
 	// limit by the number of operations
 	bool inAllRegions = true;
-	for (auto val : vecVals) {
-		for (auto quad : mapQuads) {
+	for (auto&& val : vecVals) {
+		for (auto&& quad : mapQuads) {
 			if (!m_predicate->satisfies(quad.second, val)) {
 				inAllRegions = false;
 				break;
