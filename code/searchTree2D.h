@@ -464,7 +464,7 @@ void SearchTree2D<Value, NodeCompare>::Node::clear() {
 	m_data.clear();
 }
 
-// Get values belonging to child leafs whos search space satisfies the test compare
+// Get values belonging to child leafs whose search space satisfies the test compare
 template<class Value, class NodeCompare>
 auto SearchTree2D<Value, NodeCompare>::Node::getNearbyValues(const NodeCompare& compare) const -> SetValue {
 
