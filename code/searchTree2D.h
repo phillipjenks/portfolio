@@ -142,8 +142,6 @@ private:
 	public:
 
 		// Constructor. Uses the parent's predicate
-		// Disallow default construction
-		Node() = delete;
 		Node(Predicate* pred);
 		~Node();
 
