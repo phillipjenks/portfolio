@@ -57,6 +57,33 @@ body {
 .nav-stacked > li + li {
 	margin-top: 0;
 }
+
+.external-links {
+	position: absolute;
+	bottom: 5px;
+	padding-left: 15px;
+	font-size: 30px;
+}
+
+.external-links > a {
+	margin-right: 15px;
+}
+
+.fa-github {
+	color: black;
+}
+.fa-github:hover {
+	color: #4078c0;
+}
+
+.fa-linkedin-square {
+	color: #0077b5;
+}
+
+.fa-linkedin-square:hover {
+	color: #005e9c;
+}
+
 .right-bar {
 	position: absolute;
 	top: 50px;
