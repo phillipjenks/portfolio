@@ -59,8 +59,7 @@ body {
 }
 
 .external-links {
-	position: absolute;
-	bottom: 5px;
+	padding-top: 10px;
 	padding-left: 15px;
 	font-size: 30px;
 }
