@@ -139,6 +139,12 @@ li > .project-title {
 	float: left;
 	margin-right: 20px;
 }
+.mhsww-img {
+	width: 300px;
+	height: auto;
+	float: right;
+	margin-right: 20px;
+}
 .simgen-img {
 	width: auto;
 	height: 340px;
